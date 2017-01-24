@@ -5,34 +5,26 @@
  */
 package tarea3psp2eva;
 
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author usuario
  */
 public class Servidor extends javax.swing.JFrame {
-    
+
     int numActuales, numConexiones, variableMax = 10;
     Socket[] AlmacenSocket = new Socket[10];
-    
-
 
     /**
      * Creates new form Servidor
      */
     public Servidor() {
         initComponents();
-        try {
-        ServerSocket servidor = new ServerSocket(55000);
-            
-
-            // Se conecta un cliente
-            // Crea objeto
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
     }
 
     /**
@@ -121,7 +113,7 @@ public class Servidor extends javax.swing.JFrame {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+            * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
          */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
@@ -147,6 +139,20 @@ public class Servidor extends javax.swing.JFrame {
                 new Servidor().setVisible(true);
             }
         });
+        try {
+            ServerSocket servidor = new ServerSocket(55000);
+            Socket cliente;
+            System.out.println("Servidor preparado para trabajar");
+            while (true) { //bucle infinito
+
+                cliente = servidor.accept();
+                HiloDelServidor hilo = new HiloDelServidor(cliente);
+                hilo.start();
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(Servidor.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

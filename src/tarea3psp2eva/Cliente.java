@@ -5,9 +5,12 @@
  */
 package tarea3psp2eva;
 
+import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.logging.Level;
@@ -29,9 +32,34 @@ public class Cliente extends javax.swing.JFrame {
     }
 
     public void crearHilo() {
+        String host = "localhost"; //host local
+        int puerto = 55000; //puerto de conexion
+        String cadena = ""; //para texto que leo del teclado
+        String cadenaServer = ""; //texto que recibo del servidor
         try {
-            sc = new Socket("localhost", 6600);
+            Socket cliente = new Socket(host, puerto); //socket en el puerto
+            //flujos de entrada y salida al servidor
+            BufferedReader entrada = new BufferedReader(new InputStreamReader(cliente.getInputStream()));
+            PrintWriter salida = new PrintWriter(cliente.getOutputStream(), true);
+            //Flujo para la entrada estandar
+            cadena = txt_2.getText();
+            while (true) {
+                if("".equals(Cadena)){
+                    
+                }
+                salida.println(cadena); //escribo en el flujo de salida
+                cadenaServer = entrada.readLine(); //leeo del flujo de entrada 
+                System.out.println("El texto recibido del servidor es: " + cadenaServer);
+                if ("*".equals(cadena)) {
+                    break;
+                }
+            }
 
+//cierro flujos y socket
+            entrada.close();
+            salida.close();
+            teclado.close();
+            cliente.close();
         } catch (IOException ex) {
             Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -132,6 +160,7 @@ public class Cliente extends javax.swing.JFrame {
 //            Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
 //        }
 
+
     }//GEN-LAST:event_bt_enviarActionPerformed
 
     private void bt_salirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_salirActionPerformed
@@ -144,22 +173,16 @@ public class Cliente extends javax.swing.JFrame {
      */
     public static void main(String args[]) {
 
-        
-
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new Cliente().setVisible(true);
             }
         });
+        nombre=JOptionPane.showInputDialog("Escribe tu Nick");
+        
     }
 
-    public String getNombre() {
-        return nombre;
-    }
-
-    public  void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
+    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton bt_enviar;
