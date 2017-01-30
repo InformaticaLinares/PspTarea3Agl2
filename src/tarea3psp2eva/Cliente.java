@@ -5,13 +5,9 @@
  */
 package tarea3psp2eva;
 
-import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -24,45 +20,26 @@ import javax.swing.JOptionPane;
 public class Cliente extends javax.swing.JFrame {
 
     HiloDelServidor hilo;
-    Socket sc;
-    static String nombre;
+    Socket socket;
+    String nick;
+    DataInputStream entrada;
+    DataOutputStream salida;
 
     public Cliente() {
         initComponents();
     }
 
-    public void crearHilo() {
-        String host = "localhost"; //host local
-        int puerto = 55000; //puerto de conexion
-        String cadena = ""; //para texto que leo del teclado
-        String cadenaServer = ""; //texto que recibo del servidor
+    public Cliente(Socket sc, String nom) {
+        this.socket = sc;
+        this.nick = nom;
         try {
-            Socket cliente = new Socket(host, puerto); //socket en el puerto
-            //flujos de entrada y salida al servidor
-            BufferedReader entrada = new BufferedReader(new InputStreamReader(cliente.getInputStream()));
-            PrintWriter salida = new PrintWriter(cliente.getOutputStream(), true);
-            //Flujo para la entrada estandar
-            cadena = txt_2.getText();
-            while (true) {
-                if("".equals(Cadena)){
-                    
-                }
-                salida.println(cadena); //escribo en el flujo de salida
-                cadenaServer = entrada.readLine(); //leeo del flujo de entrada 
-                System.out.println("El texto recibido del servidor es: " + cadenaServer);
-                if ("*".equals(cadena)) {
-                    break;
-                }
-            }
-
-//cierro flujos y socket
-            entrada.close();
-            salida.close();
-            teclado.close();
-            cliente.close();
+            entrada = new DataInputStream(sc.getInputStream());
+            salida = new DataOutputStream(sc.getOutputStream());
+            salida.writeUTF("> Entra en el chat " + nick);
         } catch (IOException ex) {
             Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
         }
+        initComponents();
     }
 
     /**
@@ -75,14 +52,13 @@ public class Cliente extends javax.swing.JFrame {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        txt_1 = new javax.swing.JTextField();
+        txtEscribir = new javax.swing.JTextField();
         bt_enviar = new javax.swing.JButton();
         bt_salir = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
-        txt_2 = new javax.swing.JTextArea();
+        txtChat = new javax.swing.JTextArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
-        setPreferredSize(new java.awt.Dimension(500, 350));
 
         bt_enviar.setText("Enviar");
         bt_enviar.addActionListener(new java.awt.event.ActionListener() {
@@ -98,10 +74,10 @@ public class Cliente extends javax.swing.JFrame {
             }
         });
 
-        txt_2.setEditable(false);
-        txt_2.setColumns(20);
-        txt_2.setRows(5);
-        jScrollPane1.setViewportView(txt_2);
+        txtChat.setEditable(false);
+        txtChat.setColumns(20);
+        txtChat.setRows(5);
+        jScrollPane1.setViewportView(txtChat);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -111,7 +87,7 @@ public class Cliente extends javax.swing.JFrame {
                 .addGap(20, 20, 20)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 377, Short.MAX_VALUE)
-                    .addComponent(txt_1))
+                    .addComponent(txtEscribir))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(bt_salir, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -123,7 +99,7 @@ public class Cliente extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txt_1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtEscribir, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(bt_enviar))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -153,43 +129,55 @@ public class Cliente extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void bt_enviarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_enviarActionPerformed
-//        try {
-//            DataOutputStream salidaC = new DataOutputStream(sc.getOutputStream());
-//            salidaC.writeUTF(txt_1.getText());
-//        } catch (IOException ex) {
-//            Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-
-
+        try {
+            salida.writeUTF(nick + "> " + txtEscribir.getText());
+            txtEscribir.setText("");
+        } catch (IOException ex) {
+            Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_bt_enviarActionPerformed
 
     private void bt_salirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_salirActionPerformed
-        //DataInputStream entradaC = new DataInputStream(sc.getInputStream());
-        JOptionPane.showMessageDialog(this, "Saliendo del chat", "Exit", JOptionPane.NO_OPTION);
+        try {
+            salida.writeUTF(">Sale del chat: " + nick);
+        } catch (IOException ex) {
+            Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.exit(0);
     }//GEN-LAST:event_bt_salirActionPerformed
 
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
+        String nombre = JOptionPane.showInputDialog("Escribe tu Nick:");
+        final Cliente cliente;
+        try {
+            cliente = new Cliente(new Socket("localhost", 55000), nombre);
+            cliente.setVisible(true);
+            cliente.ejecutar();
+        } catch (IOException ex) {
+            Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new Cliente().setVisible(true);
-            }
-        });
-        nombre=JOptionPane.showInputDialog("Escribe tu Nick");
-        
     }
 
-    
+    public void ejecutar() throws IOException {
+        boolean aux = true;
+        while (aux) {
+            if (entrada.available() > 0) {
+                txtChat.setText(entrada.readUTF());
+            }
+            
+        }
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton bt_enviar;
     private javax.swing.JButton bt_salir;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextField txt_1;
-    private javax.swing.JTextArea txt_2;
+    private javax.swing.JTextArea txtChat;
+    private javax.swing.JTextField txtEscribir;
     // End of variables declaration//GEN-END:variables
 }

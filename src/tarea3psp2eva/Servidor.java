@@ -10,6 +10,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JTextArea;
 
 /**
  *
@@ -17,8 +18,10 @@ import java.util.logging.Logger;
  */
 public class Servidor extends javax.swing.JFrame {
 
-    int numActuales, numConexiones, variableMax = 10;
-    Socket[] AlmacenSocket = new Socket[10];
+    static int numActuales;
+    static int numConexiones;
+    static int Max = 10;
+    static Socket[] AlmacenSocket = new Socket[10];
 
     /**
      * Creates new form Servidor
@@ -26,6 +29,16 @@ public class Servidor extends javax.swing.JFrame {
     public Servidor() {
         initComponents();
     }
+
+    public static JTextArea getTxtChat() {
+        return txtChat;
+    }
+
+    public static void setTxtChat(JTextArea txtChat) {
+        Servidor.txtChat.setText(txtChat.getText());
+    }
+    
+    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -58,7 +71,7 @@ public class Servidor extends javax.swing.JFrame {
 
         jPanel1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(51, 102, 255)));
 
-        lblConexiones.setText("Número de conexiones activa: 0");
+        lblConexiones.setText("Número de conexiones activas: 0");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -67,7 +80,7 @@ public class Servidor extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(lblConexiones)
-                .addContainerGap(219, Short.MAX_VALUE))
+                .addContainerGap(212, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -135,31 +148,41 @@ public class Servidor extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
+            Servidor server;
+
             public void run() {
-                new Servidor().setVisible(true);
+                server = new Servidor();
+                server.setVisible(true);
             }
         });
         try {
             ServerSocket servidor = new ServerSocket(55000);
             Socket cliente;
-            System.out.println("Servidor preparado para trabajar");
-            while (true) { //bucle infinito
+            while (true) { 
+                if (numConexiones < 10) {
+                    cliente = servidor.accept();
+                    new HiloDelServidor(cliente).start();
+                    for (int i = 0; i < Max; i++) {
+                        if (!AlmacenSocket[i].isConnected()) {
+                            AlmacenSocket[i]=cliente;
+                            numConexiones++;
+                        }
 
-                cliente = servidor.accept();
-                HiloDelServidor hilo = new HiloDelServidor(cliente);
-                hilo.start();
+                    }
+                    
+                    lblConexiones.setText("Numero de conexiones activas: " + numConexiones);
+                }
             }
         } catch (IOException ex) {
             Logger.getLogger(Servidor.class.getName()).log(Level.SEVERE, null, ex);
         }
-        //</editor-fold>
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSalir;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JLabel lblConexiones;
-    private javax.swing.JTextArea txtChat;
+    private static javax.swing.JLabel lblConexiones;
+    private static javax.swing.JTextArea txtChat;
     // End of variables declaration//GEN-END:variables
 }

@@ -7,14 +7,13 @@ package tarea3psp2eva;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JTextArea;
 
 /**
  *
@@ -24,32 +23,45 @@ public class HiloDelServidor extends Thread {
 
     private Cliente cliente;
     private Socket socket;
-    private BufferedReader entrada;
-    private PrintWriter salida;
-
-    public Cliente getCliente() {
-        return cliente;
-    }
-
-    public void setCliente(Cliente cliente) {
-        this.cliente = cliente;
-    }
+    private DataInputStream entrada;
+    private DataOutputStream salida;
 
     public HiloDelServidor(Socket s) {
         try {
             socket = s;
             //flujos de entrada y salida
-            entrada = new BufferedReader(new InputStreamReader(
-                    socket.getInputStream()));
-            salida = new PrintWriter(socket.getOutputStream(), true);
+            entrada = new DataInputStream(socket.getInputStream());
+            salida = new DataOutputStream(socket.getOutputStream());
         } catch (IOException ex) {
             Logger.getLogger(HiloDelServidor.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }
 
-    public void envioMensajes(String texto) {
-        
+    public void envioMensajes(String txt) {
+
+        try {
+            for (int i = 0; i < Servidor.AlmacenSocket.length; i++) {
+                DataOutputStream out = new DataOutputStream(Servidor.AlmacenSocket[i].getOutputStream());
+                out.writeUTF(txt);
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(HiloDelServidor.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
+    public void run() {
+        envioMensajes(Servidor.getTxtChat().getText());
+        while (true) {
+            try {
+                String leido=entrada.readUTF();
+                JTextArea aux = Servidor.getTxtChat();
+                aux.setText(aux.getText()+leido + "\n");
+                Servidor.setTxtChat(aux);
+                envioMensajes(Servidor.getTxtChat().getText());
+            } catch (IOException ex) {
+                Logger.getLogger(HiloDelServidor.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
 }

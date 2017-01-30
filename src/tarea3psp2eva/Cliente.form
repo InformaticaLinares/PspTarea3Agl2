@@ -50,7 +50,7 @@
                   <EmptySpace min="-2" pref="20" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="jScrollPane1" pref="377" max="32767" attributes="0"/>
-                      <Component id="txt_1" max="32767" attributes="0"/>
+                      <Component id="txtEscribir" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
@@ -66,7 +66,7 @@
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="txt_1" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="txtEscribir" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="bt_enviar" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
@@ -80,7 +80,7 @@
         </DimensionLayout>
       </Layout>
       <SubComponents>
-        <Component class="javax.swing.JTextField" name="txt_1">
+        <Component class="javax.swing.JTextField" name="txtEscribir">
         </Component>
         <Component class="javax.swing.JButton" name="bt_enviar">
           <Properties>
@@ -105,7 +105,7 @@
 
           <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
           <SubComponents>
-            <Component class="javax.swing.JTextArea" name="txt_2">
+            <Component class="javax.swing.JTextArea" name="txtChat">
               <Properties>
                 <Property name="editable" type="boolean" value="false"/>
                 <Property name="columns" type="int" value="20"/>
